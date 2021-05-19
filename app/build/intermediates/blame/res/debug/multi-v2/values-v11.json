@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v11\\values-v11.xml",
+            "outputFile": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v11\\values-v11.xml",
             "map": [
                 {
-                    "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\values-v11\\styles.xml",
+                    "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\values-v11\\styles.xml",
                     "from": {
                         "startLines": "6",
                         "startColumns": "4",

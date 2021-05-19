@@ -1,4 +1,0 @@
-#Mon Dec 17 10:37:55 CST 2018
-base.0=E\:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\5
-path.0=classes.dex
-renamed.0=classes.dex

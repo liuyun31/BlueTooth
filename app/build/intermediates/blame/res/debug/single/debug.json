@@ -1,42 +1,62 @@
 [
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_logo.png.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\drawable-hdpi\\logo.png"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_bx.jpg.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-hdpi\\bx.jpg"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_device_name.xml.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\layout\\device_name.xml"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ic_launcher.png.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-xxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi_ic_launcher.png.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\drawable-xhdpi\\ic_launcher.png"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_bg.jpg.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-hdpi\\bg.jpg"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_set_align_dialog.xml.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\layout\\set_align_dialog.xml"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_device_name.xml.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\layout\\device_name.xml"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_device_list.xml.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\layout\\device_list.xml"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_t6.jpg.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-hdpi\\t6.jpg"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_main.xml.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\layout\\activity_main.xml"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_head.jpg.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-hdpi\\head.jpg"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_button_dialog.xml.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\layout\\button_dialog.xml"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_logo.png.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-hdpi\\logo.png"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\menu_main.xml.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\menu\\main.xml"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_button_dialog.xml.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\layout\\button_dialog.xml"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ic_launcher.png.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\drawable-xxhdpi\\ic_launcher.png"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_device_list.xml.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\layout\\device_list.xml"
     },
     {
-        "merged": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi_ic_launcher.png.flat",
-        "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\drawable-mdpi\\ic_launcher.png"
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi_ic_launcher.png.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-mdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_l16.jpg.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-hdpi\\l16.jpg"
+    },
+    {
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_set_align_dialog.xml.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\layout\\set_align_dialog.xml"
+    },
+    {
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\menu_main.xml.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\menu\\main.xml"
+    },
+    {
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi_ic_launcher.png.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\drawable-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_main.xml.flat",
+        "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\layout\\activity_main.xml"
     }
 ]

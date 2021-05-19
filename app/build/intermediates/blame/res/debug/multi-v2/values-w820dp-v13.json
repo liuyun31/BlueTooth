@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-w820dp-v13\\values-w820dp-v13.xml",
+            "outputFile": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-w820dp-v13\\values-w820dp-v13.xml",
             "map": [
                 {
-                    "source": "E:\\workspaces\\MyDemo\\BLE\\BlueTooth\\app\\src\\main\\res\\values-w820dp\\dimens.xml",
+                    "source": "D:\\android studio\\BlueTooth\\A1625-BlueTooth\\app\\src\\main\\res\\values-w820dp\\dimens.xml",
                     "from": {
                         "startLines": "7",
                         "startColumns": "4",

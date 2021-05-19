@@ -6,10 +6,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
@@ -22,7 +27,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,155 +39,250 @@ import com.example.bluetooth.BluetoothService;
 import com.example.bluetooth.DeviceListActivity;
 import com.example.bluetoothassist.R;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MainActivity extends Activity {
-    private static final String TAG = "MainActivity";
-    private static final boolean DEBUG = true;
+import android.text.format.DateFormat;
 
+public class MainActivity  extends Activity   {
+
+    private static int RESULT_LOAD_IMAGE = 9;
     public static final int REC_DATA = 2;
     public static final int CONNECTED_DEVICE_NAME = 4;
     public static final int BT_TOAST = 5;
     public static final int MAIN_TOAST = 6;
-
     // 标志字符串常量
     public static final String DEVICE_NAME = "device name";
     public static final String TOAST = "toast";
-
+    private static final String TAG = "MainActivity";
+    private static final boolean DEBUG = true;
     // 意图请求码
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
-
-
-    private TextView RecDataView;
-    private Button ClearWindow, pauseButton, sendButton;
-    private Button Button01, Button02, Button03, Button04, Button05;
-    private StringBuffer Str2Send1 = new StringBuffer("1"),
-            Str2Send2 = new StringBuffer("2"),
-            Str2Send3 = new StringBuffer("3"),
-            Str2Send4 = new StringBuffer("4"),
-            Str2Send5 = new StringBuffer("5");
-    private RadioGroup rgRec, rgSend;
-    private EditText sendContent, period;
-    private CheckBox setPeriod;
-    // 已连接设备的名字
-    private String mConnectedDeviceName = null;
-    //蓝牙连接服务对象
-    private BluetoothAdapter mBluetoothAdapter = null;
-
-    private BluetoothService mConnectService = null;
-    static boolean isHEXsend = false, isHEXrec = false;
-
-
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    static boolean isHEXsend = false, isHEXrec = false;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+    timeThread timeTask = null;
+    String[] hex_string_table = new String[256];
 
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+    private TextView RecDataView,tvModel,tvTempValue,tvHumiValue;
+    private TextView dis_0,dis_1,dis_2,dis_3,dis_4,dis_5,dis_6,dis_7;
+
+    private Button Button01, Button02, Button03, Button04;
+    private Button Button05, Button06, Button07, Button08;
+    private Button Button09, Button10, Button11, Button12;
+    private Button Button13, Button14, Button15, Button16;
+    private Button Button17, Button18, Button19, Button20;
+
+    private LinearLayout lay10,lay11,lay12,lay13,lay14,lay15,lay16,lay17,lay18,lay19,lay20;
+    private byte[] bs_send = new byte[1];
+
+
+    private ImageView imageView;
+
+    private String modeByte="00";
+    private String ps="00";
+    private String ts="00";
+    int start = 0; //开始 停止
+    private File root ;
+
+    //图片路径
+    private String picturePath="null";
+
+    // 已连接设备的名字
+    private String mConnectedDeviceName = null;
+    //蓝牙连接服务对象
+    private BluetoothAdapter mBluetoothAdapter = null;
+    private BluetoothService mConnectService = null;
+    /**
+     * 自定义按键长按监听方法，进入定义按键的对话框
+     */
+
+    private OnLongClickListener ButtonLongClickListener = new OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            switch (v.getId()) {
+                case R.id.Button01:
+                    //new defineButtonDialog(MainActivity.this, Button01, Str2Send1).show();
+                    break;
+                case R.id.Button02:
+                   //new defineButtonDialog(MainActivity.this, Button02, Str2Send2).show();
+                    break;
+                case R.id.Button03:
+                    //new defineButtonDialog(MainActivity.this, Button03, Str2Send3).show();
+                    break;
+
+            }
+            return false;
         }
-    }
 
-    private void saveConfig() {
-        String filename = Environment.getExternalStorageDirectory().getPath() + "/蓝牙串口助手.config";
-        File f = new File(filename);
-        FileOutputStream fOut;
-        try {
-            f.createNewFile();
-            fOut = new FileOutputStream(f);
-            fOut.write(Button01.getText().toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Str2Send1.toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Button02.getText().toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Str2Send2.toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Button03.getText().toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Str2Send3.toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Button04.getText().toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Str2Send4.toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Button05.getText().toString().getBytes());
-            fOut.write('\0');
-            fOut.write(Str2Send5.toString().getBytes());
-            fOut.write('\0');
-            fOut.flush();
-            fOut.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    };
+    /**
+     * 所有按键的监听方法，
+     * 分别根据按键ID处理其相应的事件
+     */
+    private OnClickListener ButtonClickListener = new OnClickListener() {
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.Button01:
+                    //sendMessage(null, "1234");
+                    bs_send[0] = '0';
+                    mConnectService.write(bs_send);
+                    break;
+
+                case R.id.Button02:
+                    bs_send[0] = '1';
+                    mConnectService.write(bs_send);
+                    break;
+
+                case R.id.Button03:
+                    bs_send[0] = '2';
+                    mConnectService.write(bs_send);
+                    break;
+
+                case R.id.Button04:
+                    bs_send[0] = '3';
+                    mConnectService.write(bs_send);
+                    break;
+
+                case R.id.Button05:
+                    bs_send[0] = '4';
+                    mConnectService.write(bs_send);
+                    break;
+            }
         }
-    }
+    };
 
-    private void restoreConfig() {
-        String filename = Environment.getExternalStorageDirectory().getPath() + "/蓝牙串口助手.config";
-        File f = new File(filename);
-        FileInputStream fIn;
-        try {
-            fIn = new FileInputStream(f);
-            byte[] bs = new byte[1024];
-            fIn.read(bs);
-            String s = new String(bs);
-            String[] ss = s.split("\0");
-            Button01.setText(ss[0]);
-            Str2Send1.append(ss[1]);
-            Button02.setText(ss[2]);
-            Str2Send2.append(ss[3]);
-            Button03.setText(ss[4]);
-            Str2Send3.append(ss[5]);
-            Button04.setText(ss[6]);
-            Str2Send4.append(ss[7]);
-            Button05.setText(ss[8]);
-            Str2Send5.append(ss[9]);
-            fIn.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    /**
+     * 定时选择框组件监听方法
+     * 开启相应的时间任务
+     */
+    private OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
         }
-    }
+    };
+    private int align_num = 0;//对齐字节数
+    private String target_device_name = null;
+    // 用于从线程获取信息的Handler对象
+    private final Handler mHandler = new Handler() {
+        StringBuffer sb = new StringBuffer();
+        byte[] bs;
+        float sWidth;
+        int b, i, lineWidth = 0, align_i = 0;
 
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case REC_DATA:
 
+                        //处理下位机发送的数据
+                        bs = (byte[]) msg.obj;//接收到的数据转成byte[]
+                    try{
+
+                        String dd=new String(bs,"UTF-8");
+
+                        //tvModel.setText(dd);  //截取第一个字符串的内容 看是否是H开头
+                        int home = bs[0];
+                        if(home=='0')
+                        {
+                            int MQ3= bs[1];
+                            int MQ7 = bs[2];的
+                            dis_1.setText("酒精："  + MQ3  +  "%");
+                            dis_2.setText("一氧化碳："  + MQ7 + "%");
+                        }
+                    } catch (Exception e) {
+
+                    }
+
+                   //RecDataView.append(sb);
+                    break;
+                case CONNECTED_DEVICE_NAME:
+                    // 提示已连接设备名
+                    mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+                    Toast.makeText(getApplicationContext(), "已连接到"
+                            + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                    MainActivity.this.setTitle("设备已连接");//蓝牙连接成功  //标题框显示  LDJ
+                    break;
+                case BT_TOAST:
+                    if (mConnectedDeviceName != null)
+                        Toast.makeText(getApplicationContext(), "与" + mConnectedDeviceName +
+                                msg.getData().getString(TOAST), Toast.LENGTH_SHORT).show();
+                    else Toast.makeText(getApplicationContext(), "与" + target_device_name +
+                            msg.getData().getString(TOAST), Toast.LENGTH_SHORT).show();
+                    MainActivity.this.setTitle("设备未连接");//蓝牙连接失败     //标题框显示  LDJ
+                    mConnectedDeviceName = null;
+                    break;
+                case MAIN_TOAST:
+                    Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+
+    //跳入文件，首先执行下面函数，进行初始化控件
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //以下是实例化控件
+        //imageView = (ImageView) findViewById(R.id.imgView);
+        lay10=(LinearLayout) findViewById(R.id.Ly10);
+        lay11=(LinearLayout) findViewById(R.id.Ly11);
+        lay12=(LinearLayout) findViewById(R.id.Ly12);
+        lay13=(LinearLayout) findViewById(R.id.Ly13);
+        lay14=(LinearLayout) findViewById(R.id.Ly14);
+        lay15=(LinearLayout) findViewById(R.id.Ly15);
+        lay16=(LinearLayout) findViewById(R.id.Ly16);
+        lay17=(LinearLayout) findViewById(R.id.Ly17);
+        lay18=(LinearLayout) findViewById(R.id.Ly18);
+
+        dis_1 = (TextView)findViewById(R.id.TextView01);
+        dis_2 = (TextView)findViewById(R.id.TextView02);
+        dis_3 = (TextView)findViewById(R.id.TextView03);
+        dis_4 = (TextView)findViewById(R.id.TextView04);
+        dis_5 = (TextView)findViewById(R.id.TextView05);
+        dis_6 = (TextView)findViewById(R.id.TextView06);
+        dis_7 = (TextView)findViewById(R.id.TextView07);
+
+        //找到按键控件
         Button01 = (Button) findViewById(R.id.Button01);
         Button02 = (Button) findViewById(R.id.Button02);
         Button03 = (Button) findViewById(R.id.Button03);
         Button04 = (Button) findViewById(R.id.Button04);
         Button05 = (Button) findViewById(R.id.Button05);
-        RecDataView = (TextView) findViewById(R.id.Rec_Text_show);
-        ClearWindow = (Button) findViewById(R.id.ClearWindow);
-        pauseButton = (Button) findViewById(R.id.pauseButton);
-        sendContent = (EditText) findViewById(R.id.sendContent);
-        period = (EditText) findViewById(R.id.period);
-        sendButton = (Button) findViewById(R.id.sendButton);
-        setPeriod = (CheckBox) findViewById(R.id.setPeriod);
-        rgRec = (RadioGroup) findViewById(R.id.rgRec);
-        rgSend = (RadioGroup) findViewById(R.id.rgSend);
-        setupListener();
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        setupListener();   //按键进入监听
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); //创建蓝牙
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
             finish();
             return;
         }//savaData();
-        this.setTitle("蓝牙串口助手(未连接)");
-        init_hex_string_table();
-        verifyStoragePermissions(this);
-        restoreConfig();
+
+        this.setTitle("设备未连接");        //标题框显示  LDJ
+
+        //设置底边栏状态和相关显示
+        showHome();//显示主页
+
+        new TimeThread().start(); //启动新的线程  显示时间
+
+        root = Environment.getExternalStorageDirectory();
     }
+
 
     @Override
     public void onStart() {
@@ -206,131 +310,93 @@ public class MainActivity extends Activity {
         }
     }
 
+    //显示首页
+    private void showHome()
+    {
+        lay10.setVisibility(View.VISIBLE);
+        lay11.setVisibility(View.VISIBLE);
+        lay12.setVisibility(View.VISIBLE);
+        lay13.setVisibility(View.VISIBLE);
+        lay14.setVisibility(View.VISIBLE);
+        lay15.setVisibility(View.VISIBLE);
+        lay16.setVisibility(View.VISIBLE);
+        lay17.setVisibility(View.VISIBLE);
+        lay18.setVisibility(View.VISIBLE);
+       // RecDataView.setVisibility(View.VISIBLE);
+    }
+
     /**
-     * 自定义按键长按监听方法，进入定义按键的对话框
+     * 使用FileWriter进行文本内容的追加
+     *
+     * @param content
      */
-    private OnLongClickListener ButtonLongClickListener = new OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            switch (v.getId()) {
-                case R.id.Button01:
-                    new defineButtonDialog(MainActivity.this, Button01, Str2Send1).show();
-                    break;
-                case R.id.Button02:
-                    new defineButtonDialog(MainActivity.this, Button02, Str2Send2).show();
-                    break;
-                case R.id.Button03:
-                    new defineButtonDialog(MainActivity.this, Button03, Str2Send3).show();
-                    break;
-                case R.id.Button04:
-                    new defineButtonDialog(MainActivity.this, Button04, Str2Send4).show();
-                    break;
-                case R.id.Button05:
-                    new defineButtonDialog(MainActivity.this, Button05, Str2Send5).show();
-                    break;
+    private void addTxtToFileWrite(String content) {
+        FileWriter writer = null;
+        try {
+            //FileWriter(file, true),第二个参数为true是追加内容，false是覆盖
+            writer = new FileWriter(root + "/userr.txt", false);
+            writer.write("\r\n");//换行
+            writer.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            return false;
+        }
+    }
+
+    //从SD卡读取文件
+    public String readFromFile() {
+        //读的时候要用字符流   万一里面有中文
+        BufferedReader reader = null;
+        FileInputStream fis;
+        StringBuilder sbd = new StringBuilder();
+        String state = Environment.getExternalStorageState();
+        if (!state.equals(Environment.MEDIA_MOUNTED)) {
+            Toast.makeText(this, "SD卡未就绪", Toast.LENGTH_SHORT).show();
+            return "";
         }
 
-    };
-    /**
-     * 所有按键的监听方法，
-     * 分别根据按键ID处理其相应的事件
-     */
-    private OnClickListener ButtonClickListener = new OnClickListener() {
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.Button01:
-                    sendMessage(Button01, Str2Send1.toString());
-                    break;
-                case R.id.Button02:
-                    sendMessage(Button02, Str2Send2.toString());
-                    break;
-                case R.id.Button03:
-                    sendMessage(Button03, Str2Send3.toString());
-                    break;
-                case R.id.Button04:
-                    sendMessage(Button04, Str2Send4.toString());
-                    break;
-                case R.id.Button05:
-                    sendMessage(Button05, Str2Send5.toString());
-                    break;
-                case R.id.ClearWindow:
-                    RecDataView.setText("");
-                    break;
-                case R.id.sendButton:
-                    sendMessage(sendButton, sendContent.getText().toString());
-                    break;
-                case R.id.pauseButton:
-                    if (BluetoothService.allowRec) pauseButton.setText("继续");
-                    else pauseButton.setText("暂停");
-                    BluetoothService.allowRec = !BluetoothService.allowRec;
-                    break;
+        try {
+            fis = new FileInputStream(root + "/userr.txt");
+            reader = new BufferedReader(new InputStreamReader(fis));
+            String row;
+            while ((row = reader.readLine()) != null) {
+                sbd.append(row);
+            }
+        } catch (FileNotFoundException e) {
+          //  Toast.makeText(this, "文件不存在", Toast.LENGTH_SHORT).show();
+            //e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-    };
-    /**
-     * 定时选择框组件监听方法
-     * 开启相应的时间任务
-     */
-    private OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (isChecked) {
-                String s = period.getText().toString();
-                //新建时间任务
-                if (s.length() != 0) {
-                    timeTask = new timeThread(Integer.valueOf(s));
-                } else timeTask = new timeThread(1000);
-                //启动定时任务
-                timeTask.start();
-            } else timeTask.interrupt();
-        }
-    };
-    /**
-     * RadioGroup的监听方法
-     * 根据RadioButton的ID处理相应事件
-     */
-    private RadioGroup.OnCheckedChangeListener rgListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            switch (checkedId) {
-                case R.id.receiveASCII:
-                    isHEXrec = false;
-                    break;
-                case R.id.receiveHEX:
-                    isHEXrec = true;
-                    break;
-                case R.id.sendASCII:
-                    isHEXsend = false;
-                    break;
-                case R.id.sendHEX:
-                    isHEXsend = true;
-                    break;
-            }
-        }
-    };
+        return sbd.toString();
+    }
 
     /**
      * 设置自定按键及其他固定按键的监听方法
      */
     private void setupListener() {
+
+        //为按钮添加点击事件
         Button01.setOnClickListener(ButtonClickListener);
         Button02.setOnClickListener(ButtonClickListener);
         Button03.setOnClickListener(ButtonClickListener);
         Button04.setOnClickListener(ButtonClickListener);
         Button05.setOnClickListener(ButtonClickListener);
-        Button01.setOnLongClickListener(ButtonLongClickListener);
-        Button02.setOnLongClickListener(ButtonLongClickListener);
-        Button03.setOnLongClickListener(ButtonLongClickListener);
-        Button04.setOnLongClickListener(ButtonLongClickListener);
-        Button05.setOnLongClickListener(ButtonLongClickListener);
-        ClearWindow.setOnClickListener(ButtonClickListener);
-        pauseButton.setOnClickListener(ButtonClickListener);
-        sendButton.setOnClickListener(ButtonClickListener);
-        setPeriod.setOnCheckedChangeListener(checkBoxListener);
-        rgRec.setOnCheckedChangeListener(rgListener);
-        rgSend.setOnCheckedChangeListener(rgListener);
     }
 
     @Override
@@ -352,7 +418,7 @@ public class MainActivity extends Activity {
         // Stop the Bluetooth connection
         if (mConnectService != null) mConnectService.cancelAllBtThread();
         if (timeTask != null) timeTask.interrupt();
-        saveConfig();
+
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
@@ -362,18 +428,7 @@ public class MainActivity extends Activity {
      * @param Str2Send 欲发送的字符串.
      */
     private void sendMessage(Button callButton, String Str2Send) {
-        if (callButton != null) {
-            if (Str2Send.length() == 0) {
-                if (callButton != sendButton) {
-                    Toast.makeText(this, "请先长按配置按键", Toast.LENGTH_SHORT).show();
-                }
-                return;
-            }
-            if (mConnectService == null || mConnectService.getState() != BluetoothService.CONNECTED) {
-                Toast.makeText(this, "未连接到任何蓝牙设备", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else if (Str2Send == null || mConnectService == null || Str2Send.equals("")) return;
+
         byte[] bs;
         if (!isHEXsend) {
             //Asc码发送 zgw 2018/12/17 0017 10:25:19
@@ -398,117 +453,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    timeThread timeTask = null;
-
-    private class timeThread extends Thread {
-        private int sleeptime;
-
-        timeThread(int militime) {
-            super();
-            sleeptime = militime;
-        }
-		/*byte[] buffer={'a','v','c','d','f','a','v','c','d','f','a','v','c',
-				'a','v','c','d','f','a','v','c','d','f','a','v','c',
-				'a','v','c','d','f','a','v','c','d','f','a','v','c',
-				'a','v','c','d','f','a','v','c','d','f','a','v','c'
-				,'d','f','a','v','c','d','f','a','v','c','d','f','\n'};*/
-
-        @Override
-        public void run() {
-            while (!isInterrupted()) {
-                if (DEBUG) Log.i("myDebug", "timeThread start");
-                sendMessage(null, sendContent.getText().toString());
-                //mHandler.obtainMessage(MainActivity.REC_DATA,buffer.length,-1,buffer).sendToTarget();
-                try {
-                    Thread.sleep(sleeptime);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
-                }
-            }
-            if (DEBUG) Log.i("myDebug", "timeThread end");
-        }
-    }
-
-    String[] hex_string_table = new String[256];
-
-    private void init_hex_string_table() {
-        for (int i = 0; i < 256; i++) {
-            if (i < 16) {
-                hex_string_table[i] = " 0" + Integer.toHexString(i).toUpperCase();
-            } else {
-                hex_string_table[i] = " " + Integer.toHexString(i).toUpperCase();
-            }
-        }
-    }
-
-    private int align_num = 0;//对齐字节数
-    // 用于从线程获取信息的Handler对象
-    private final Handler mHandler = new Handler() {
-        StringBuffer sb = new StringBuffer();
-        byte[] bs;
-        float sWidth;
-        int b, i, lineWidth = 0, align_i = 0;
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case REC_DATA:
-                    sb.setLength(0);
-                    if (isHEXrec) {
-                        bs = (byte[]) msg.obj;
-                        for (i = 0; i < msg.arg1; i++) {
-                            b = (bs[i] & 0xff);
-                            sb.append(hex_string_table[b]);
-                            sWidth = RecDataView.getPaint().measureText(hex_string_table[b]);
-                            lineWidth += sWidth;
-                            if (lineWidth > RecDataView.getWidth() || (align_num != 0 && align_num == align_i)) {
-                                lineWidth = (int) sWidth;
-                                align_i = 0;
-                                sb.insert(sb.length() - 3, '\n');
-                            }
-                            align_i++;
-                        }
-                    } else {
-                        bs = (byte[]) msg.obj;
-                        char[] c = new char[msg.arg1];
-                        for (i = 0; i < msg.arg1; i++) {
-                            c[i] = (char) (bs[i] & 0xff);
-                            sWidth = RecDataView.getPaint().measureText(c, i, 1);
-                            lineWidth += sWidth;
-                            if (lineWidth > RecDataView.getWidth()) {
-                                lineWidth = (int) sWidth;
-                                sb.append('\n');
-                            }
-                            if (c[i] == '\n') lineWidth = 0;
-                            sb.append(c[i]);
-                        }
-                    }
-                    RecDataView.append(sb);
-                    break;
-                case CONNECTED_DEVICE_NAME:
-                    // 提示已连接设备名
-                    mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-                    Toast.makeText(getApplicationContext(), "已连接到"
-                            + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
-                    MainActivity.this.setTitle("蓝牙串口助手(已连接)");
-                    break;
-                case BT_TOAST:
-                    if (mConnectedDeviceName != null)
-                        Toast.makeText(getApplicationContext(), "与" + mConnectedDeviceName +
-                                msg.getData().getString(TOAST), Toast.LENGTH_SHORT).show();
-                    else Toast.makeText(getApplicationContext(), "与" + target_device_name +
-                            msg.getData().getString(TOAST), Toast.LENGTH_SHORT).show();
-                    MainActivity.this.setTitle("蓝牙串口助手(未连接)");
-                    mConnectedDeviceName = null;
-                    break;
-                case MAIN_TOAST:
-                    Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };
-    private String target_device_name = null;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -539,6 +483,7 @@ public class MainActivity extends Activity {
                     Toast.makeText(this, "拒绝打开蓝牙", Toast.LENGTH_SHORT).show();
                     //finish();
                 }
+                break;
         }
     }
 
@@ -562,24 +507,71 @@ public class MainActivity extends Activity {
                 Intent serverIntent = new Intent(this, DeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                 return true;
-            case R.id.discoverable:
-                // 请求打开本地蓝牙可见性
-                if (mBluetoothAdapter.getScanMode() !=
-                        BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-                    Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-                    startActivity(discoverableIntent);
-                }
-                return true;
-            case R.id.RecAlign:
-                new setAlignDialog(this, new setAlignDialog.DialogCallback() {
-                    @Override
-                    public void DialogReturn(int i) {
-                        align_num = i;
-                    }
-                }).show();
         }
         return false;
     }
+
+    private class timeThread extends Thread {
+        private int sleeptime;
+
+        timeThread(int militime) {
+            super();
+            sleeptime = militime;
+        }
+
+        @Override
+        public void run() {
+            while (!isInterrupted()) {
+                if (DEBUG) Log.i("myDebug", "timeThread start");
+                // sendMessage(null, sendContent.getText().toString());
+                //mHandler.obtainMessage(MainActivity.REC_DATA,buffer.length,-1,buffer).sendToTarget();
+                try {
+                    Thread.sleep(sleeptime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+            if (DEBUG) Log.i("myDebug", "timeThread end");
+        }
+    }
+
+
+    class TimeThread extends Thread {
+        @Override
+        public void run()
+        {
+            do {
+                try {
+                    Thread.sleep(1000);
+                    Message msg = new Message();
+                    msg.what = 1;  //消息(一个整型值)
+
+                    mmHandler.sendMessage(msg);// 每隔1秒发送一个msg给mHandler
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (true);
+        }
+    }
+
+    private Handler mmHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg)
+        {
+            super.handleMessage(msg);
+            switch (msg.what)
+            {
+                case 1:
+                    long sysTime = System.currentTimeMillis();//获取系统时间
+                    //CharSequence sysTimeStr = DateFormat.format("yyyy年MM月dd日 HH:mm:ss", sysTime);//时间显示格式
+                    //CharSequence sysTimeStr = DateFormat.format("HH:mm:ss", sysTime);//时间显示格式
+                    break;
+
+                default:                    break;
+            }
+        }
+    };
 
 }
